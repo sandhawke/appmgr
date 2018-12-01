@@ -1,0 +1,35 @@
+{
+  "name": "@sandhawke/appmgr",
+  "version": "1.0.0",
+  "description": "Trivial wrapper for express",
+  "main": "appmgr.js",
+  "scripts": {
+    "test": "tap --cov test*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sandhawke/appmgr.git"
+  },
+  "keywords": [
+    "express",
+    "framework"
+  ],
+  "author": "Sandro Hawke (http://hawke.org/sandro)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sandhawke/appmgr/issues"
+  },
+  "homepage": "https://github.com/sandhawke/appmgr#readme",
+  "dependencies": {
+    "debug": "^4.1.0",
+    "escape-html-template-tag": "^1.1.0",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "delay": "^4.1.0",
+    "got": "^9.3.2",
+    "tap": "^12.1.0",
+    "tape": "^4.9.1"
+  }
+}
