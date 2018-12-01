@@ -36,10 +36,21 @@ class AppMgr {
     const app = express()
     appmgr.app = app
 
-    app.use(logger('dev'))
+    if (process.env.NODE_ENV === 'PRODUCTION') {
+      app.use(logger('production'))
+    } else {
+      app.use(logger('dev'))
+    }
 
     const HClass = H``.constructor.name
-    
+
+    app.use('/static', express.static('static', {
+      extensions: ['html', 'png', 'trig', 'nq', 'ttl', 'json', 'jsonld', 'txt'],
+      setHeaders: function (res, path, stat) {
+        if (path.endsWith('.trig')) res.set('Content-Type', 'application/trig')
+      }
+    }))
+
     app.use('/', (req, res, next) => {
       // let all the handlers know the appmgr
       req.appmgr = appmgr
@@ -74,7 +85,7 @@ class AppMgr {
     // make it fine to call start repeatedly
     if (this.started) return Promise.resolve()
     this.started = true
-    
+
     this.load() // just start the loading async
     return new Promise((resolve, reject) => {
       const appmgr = this
@@ -89,7 +100,7 @@ class AppMgr {
 
         debug(`server started at `, appmgr.siteurl)
         if (!this.silent) {
-          console.error(`server started at ${appmgr.siteurl}`)
+          console.log(`# server started at ${appmgr.siteurl}`)
         }
         resolve()
       })

@@ -1,8 +1,8 @@
-/* 
+/*
    run like:
 
    # debug and manually assigned port
-   DEBUG=* PORT=8123 node example-server.js 
+   DEBUG=* PORT=8123 node example-server.js
 
    # default port 8080, nodemon for trivial live reloads
    nodemon example-server.js
@@ -23,7 +23,7 @@ m.app.get('/', async (req, res) => {
 })
 
 m.app.get('/js', async (req, res) => {
-  res.send({x:1, y:2, now: new Date()})
+  res.send({ x: 1, y: 2, now: new Date() })
 })
 
 m.app.get('/about', async (req, res) => {
@@ -41,4 +41,3 @@ m.app.get('/q', async (req, res) => {
 <p>Query parameter "html" was: ${req.query.html}</p>
 `)
 })
-
