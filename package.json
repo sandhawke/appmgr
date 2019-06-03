@@ -1,5 +1,5 @@
 {
-  "name": "@sandhawke/appmgr",
+  "name": "appmgr",
   "version": "1.0.0",
   "description": "Trivial wrapper for express",
   "main": "appmgr.js",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "delay": "^4.1.0",
     "got": "^9.3.2",
-    "tap": "^12.1.0",
+    "tap": "^14.2.0",
     "tape": "^4.9.1"
   }
 }
