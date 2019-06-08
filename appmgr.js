@@ -2,6 +2,7 @@ const express = require('express')
 const logger = require('morgan')
 const debug = require('debug')('appmgr')
 const H = require('escape-html-template-tag')
+const fs = require('fs')
 
 /*
   Properties / Options:
@@ -34,6 +35,7 @@ class AppMgr {
     if (appmgr.server) throw Error('this is only a return value')
 
     const app = express()
+    app.H = H
     appmgr.app = app
 
     if (process.env.NODE_ENV === 'PRODUCTION') {
@@ -82,27 +84,37 @@ class AppMgr {
   }
 
   start () {
+    const appmgr = this
+
     // make it fine to call start repeatedly
     if (this.started) return Promise.resolve()
     this.started = true
 
     this.load() // just start the loading async
     return new Promise((resolve, reject) => {
-      const appmgr = this
-
-      // could move this to after the data is loaded if we want, but
-      // eventually we'll be doing dynamic loading, I expect
-      appmgr.server = appmgr.app.listen(appmgr.port, arg => {
-        appmgr.port = appmgr.server.address().port
-        if (!appmgr.siteurl) {
-          appmgr.siteurl = `http://localhost:${appmgr.port}`
+      fs.readFile('/sites/footer', 'utf8', (err, data) => {
+        if (err) {
+          data = `
+<footer>
+  <p><b>Do not use this website unless you are authorized by its owner. This website is not suitable for public use at this time. Unauthorized use might harm you, might harm other people, and might be a crime.</b></p>
+</footer>`
         }
+        appmgr.footer = data
 
-        debug(`server started at `, appmgr.siteurl)
-        if (!this.silent) {
-          console.log(`# server started at ${appmgr.siteurl}`)
-        }
-        resolve()
+        // could move this to after the data is loaded if we want, but
+        // eventually we'll be doing dynamic loading, I expect
+        appmgr.server = appmgr.app.listen(appmgr.port, arg => {
+          appmgr.port = appmgr.server.address().port
+          if (!appmgr.siteurl) {
+            appmgr.siteurl = `http://localhost:${appmgr.port}`
+          }
+
+          debug(`server started at `, appmgr.siteurl)
+          if (!this.silent) {
+            console.log(`# server started at ${appmgr.siteurl}`)
+          }
+          resolve()
+        })
       })
     })
   }
