@@ -37,6 +37,7 @@ class AppMgr {
     const app = express()
     app.H = H
     appmgr.app = app
+    app.mgr = appmgr // maybe I should just be extending app
 
     if (process.env.NODE_ENV === 'PRODUCTION') {
       app.use(logger('production'))
@@ -100,6 +101,7 @@ class AppMgr {
 </footer>`
         }
         appmgr.footer = data
+        appmgr.app.footer = data
 
         // could move this to after the data is loaded if we want, but
         // eventually we'll be doing dynamic loading, I expect
