@@ -100,6 +100,7 @@ class AppMgr {
   <p><b>Do not use this website unless you are authorized by its owner. This website is not suitable for public use at this time. Unauthorized use might harm you, might harm other people, and might be a crime.</b></p>
 </footer>`
         }
+        data = H.safe(data)
         appmgr.footer = data
         appmgr.app.footer = data
 
