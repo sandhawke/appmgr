@@ -64,6 +64,7 @@ class AppMgr {
       // so they're not sent as JSON
       const realSend = res.send.bind(res)
       res.send = (x, ...rest) => {
+        if (x === undefined) throw RangeError('cant send() undefined value')
         if (x.constructor && x.constructor.name === HClass) x = x.toString()
         return realSend(x, ...rest)
       }
