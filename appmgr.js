@@ -3,11 +3,12 @@ const logger = require('morgan')
 const debug = require('debug')('appmgr')
 const H = require('escape-html-template-tag')
 const fs = require('fs')
+const cors = require('cors')
 
 /*
   Properties / Options:
 
-  port = number, 0 for dynamic, undefined for process.end.PORT or 8080
+  port = number, 0 for dynamic, undefined for process.env.PORT or 8080
   siteurl = something like "https://host.com/data", prepended to all self URLs
   server = becomes the net.Server created, good for .close()
   app = becomes the express app created
@@ -19,6 +20,7 @@ class AppMgr {
     appmgr.H = H // just make H really handy for folks
 
     Object.assign(appmgr, options)
+    if (!this.stopHooks) this.stopHooks = []
 
     if (!appmgr.datasets) appmgr.datasets = new Map()
 
@@ -47,6 +49,7 @@ class AppMgr {
 
     const HClass = H``.constructor.name
 
+    app.use(cors())
     app.use('/static', express.static('static', {
       extensions: ['html', 'png', 'trig', 'nq', 'ttl', 'json', 'jsonld', 'txt'],
       setHeaders: function (res, path, stat) {
@@ -79,10 +82,20 @@ class AppMgr {
     }
   }
 
-  stop () {
-    return new Promise((resolve, reject) => {
+  async stop () {
+    // console.log('stopping appmgr')
+    for (const hook of this.stopHooks) {
+      // console.log('running hook %O', hook)
+      await hook()
+      // console.log('ran hook %O', hook)
+    }
+    // or in parallel?   no, we want to close DBs before RMing dirs, etc
+    // await Promise.all(this.stopHooks.map(hook => hook()))
+    
+    await new Promise((resolve, reject) => {
       this.server.close(resolve)
     })
+    // console.log('stopped appmgr')
   }
 
   start () {
