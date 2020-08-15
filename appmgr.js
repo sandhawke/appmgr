@@ -33,6 +33,13 @@ class AppMgr {
       appmgr.siteurl = process.env.SITEURL
     }
 
+    // apps need some flag like this to know whether to get
+    // remote ip from connection or x-forwarded-for.  Could be
+    // guessed at from siteurl, maybe.
+    if (!appmgr.proxied) {
+      appmgr.proxied = process.env.PROXIED
+    }
+
     if (appmgr.app) throw Error('this is only a return value')
     if (appmgr.server) throw Error('this is only a return value')
 
