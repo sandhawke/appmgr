@@ -4,6 +4,8 @@ const debug = require('debug')('appmgr')
 const H = require('escape-html-template-tag')
 const fs = require('fs')
 const cors = require('cors')
+const bodyParser = require('body-parser')
+const path = require('path')
 
 /*
   Properties / Options:
@@ -21,6 +23,11 @@ class AppMgr {
 
     Object.assign(appmgr, options)
     if (!this.stopHooks) this.stopHooks = []
+    if (!this.dirname) {
+      // should be relative to source code, not execution directory
+      this.dirname = process.cwd() 
+      console.warn('dirname not specified, using CWD ' + this.dirname)
+    }
 
     if (!appmgr.datasets) appmgr.datasets = new Map()
 
@@ -48,16 +55,23 @@ class AppMgr {
     appmgr.app = app
     app.mgr = appmgr // maybe I should just be extending app
 
-    if (process.env.NODE_ENV === 'PRODUCTION') {
-      app.use(logger('production'))
-    } else {
-      app.use(logger('dev'))
+    if (this.logger === undefined) this.logger = logger
+    if (this.logger) {
+      if (process.env.NODE_ENV === 'PRODUCTION') {
+        app.use(this.logger('production'))
+      } else {
+        app.use(this.logger('dev'))
+      }
     }
 
     const HClass = H``.constructor.name
 
     app.use(cors())
-    app.use('/static', express.static('static', {
+    app.use(bodyParser.json())
+    app.use(bodyParser.urlencoded({ extended: true }))
+
+    appmgr.static = express.static
+    app.use('/static', express.static(path.join(this.dirname, 'static'), {
       extensions: ['html', 'png', 'trig', 'nq', 'ttl', 'json', 'jsonld', 'txt'],
       setHeaders: function (res, path, stat) {
         if (path.endsWith('.trig')) res.set('Content-Type', 'application/trig')
@@ -150,4 +164,14 @@ class AppMgr {
 
 AppMgr.H = H
 AppMgr.create = (...args) => new AppMgr(...args)
+
+AppMgr.startServer = async (options = {}) => {
+  const appmgr = new AppMgr({...options, manualStart: true})
+  await appmgr.start()
+  debug('waiting at', appmgr.sitsurl)
+
+  // appmgr.stopHooks.push(...)
+  return appmgr
+}
+
 module.exports = AppMgr
