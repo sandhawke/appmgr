@@ -101,6 +101,11 @@ class AppMgr {
     if (!this.manualStart) {
       process.nextTick(() => this.start())
     }
+
+    // you can await appmgr.closed, good for test
+    this.closed = new Promise(resolve => {
+      this.closed_resolve = resolve
+    })
   }
 
   async stop () {
@@ -117,6 +122,7 @@ class AppMgr {
       this.server.close(resolve)
     })
     // console.log('stopped appmgr')
+    this.closed_resolve()
   }
 
   start () {
